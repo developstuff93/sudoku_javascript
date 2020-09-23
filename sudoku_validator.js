@@ -30,23 +30,75 @@
  * @params board an array of arrays, where each array element represents a row in a sudoku table
  * @return true if the Sudoku table contains valid values, false otherwise.
  */
-function validate(board) {
 
-  return false;
+const SUB_GRID_SIZE = 3;
+
+// Check matrix is valid - all values in matrix should be Empty or Single number
+function validateValues(matrix) {
+  for (let i = 0; i < matrix.length; i++) {
+    for (let j = 0; j < matrix[i].length; j++) {
+      let value = (matrix[i][j] === null) + matrix[i][j];
+      if (isNaN(value) || value < 1 || value > 9) {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
+// Check if there is duplicate in the array
+function checkDuplicates(array) {
+  const numArray = array.filter((num) => num >= 1 && num <= 9);
+  return numArray.length === new Set(numArray).size;
+}
 
+// Return 3 * 3 grid from the matrix by row, col
+function getSubGridFromMatrix(rowIndex, colIndex, matrix) {
+  let array = [];
+  for (let i = 0; i < SUB_GRID_SIZE; i++) {
+    for (let j = 0; j < SUB_GRID_SIZE; j++) {
+      array.push(matrix[rowIndex + i][colIndex + j]);
+    }
+  }
+  return array;
+}
 
+function validate(board) {
+  // Check all values are valid(Empty or Single Number) in Sudoku Table
+  if (!validateValues(board)) {
+    return false;
+  }
 
+  // Count of columns and rows, assumed they are always the same = 9
+  const n = board.length;
 
+  // Check duplicates in the Rows of Sudoku Table
+  for (let i = 0; i < n; i++) {
+    if (!checkDuplicates(board[i])) {
+      return false;
+    }
+  }
 
+  // Check duplicates in the Columns of Sudoku Table
+  for (let i = 0; i < n; i++) {
+    const column = board.map((row) => row[i]);
+    if (!checkDuplicates(column)) {
+      return false;
+    }
+  }
 
+  // Check duplicates of 3 * 3 Grid in Sudoku Table
+  for (let rowIndex = 0; rowIndex < n; rowIndex += SUB_GRID_SIZE) {
+    for (let colIndex = 0; colIndex < n; colIndex += SUB_GRID_SIZE) {
+      const grid = getSubGridFromMatrix(rowIndex, colIndex, board);
+      if (!checkDuplicates(grid)) {
+        return false;
+      }
+    }
+  }
 
-
-
-
-
-
+  return true;
+}
 
 
 
